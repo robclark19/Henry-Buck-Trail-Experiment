@@ -22,9 +22,7 @@ library("piecewiseSEM")
 
 
 # 2017 Ant Data #####
-
-
-ant.data <- read.csv("alchemy cookie.csv")
+ant.dat <- read.csv("./data/alchemy cookie.csv", header=TRUE)
 # add data from june 24 ant baits
 
 str(ant.data)
