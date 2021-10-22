@@ -4,12 +4,14 @@
 
 ###############################################################################
 
+library("tidyverse")
 library("lme4")
 library("car")
 library("blmeco")
 library("ggplot2")
 library("gridExtra")
 library("piecewiseSEM")
+library("readxl")
 
 # To do ###
 # import updated 2017 ant data
@@ -48,3 +50,7 @@ Anova(cp.model)
 
 
 # 2017 Plant Data #######
+buck_plants_dat <- read_excel("Data/2017 henry buck trail plant community plots.xlsx") %>% replace(is.na(.), 0)
+
+
+
