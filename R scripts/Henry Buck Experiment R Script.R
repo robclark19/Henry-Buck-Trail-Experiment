@@ -58,6 +58,13 @@ cp.model <- glm(C_pennsylvanicus ~ Treatment, data=ant.data)
 Anova(cp.model)
 
 
+
+# Ant figure ####
+# Violin plot (?) of ant abundance for apheanogaster and others
+
+
+
+
 # 2017 Plant Data #######
 buck_dat <- read_excel("Data/2017 henry buck trail plant community plots.xlsx") %>% 
   replace(is.na(.), 0) %>% 
@@ -162,7 +169,7 @@ plot(emmeans(plant_glm,  ~ Treatment_2017, type="response"))
 
 # percent ant plants (pap) of total sampled
 # this model is great. it has the proportional data, weighted by total, etc.
-# removing elaiosome bearing plants reduced thier prop in the plant community
+# removing elaiosome bearing plants reduced their prop in the plant community
 # supplementation had no real effect, control has the highest
 
 buck_dat$pap <- buck_dat$ant_plants / buck_dat$total_plants
