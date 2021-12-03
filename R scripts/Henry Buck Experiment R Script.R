@@ -1,9 +1,6 @@
-###############################################################################
-
 # Henry Buck Experiment and Associated Data
 
-###############################################################################
-
+# Libraries ####
 library("tidyverse")
 library("lme4")
 library("car")
@@ -150,9 +147,32 @@ plotgg1 <- ggplot(data=accum.long3, aes(x = Sites, y = Richness, ymax =  UPR, ym
   geom_ribbon(aes(colour=Grouping), alpha=0.2, show.legend=FALSE) + 
   BioR.theme +
   scale_color_brewer(palette = "Set1") +
-  labs(x = "# of Meter Transects", y = "Plant Species Richness", colour = "Treatment", shape = "Treatment")
+  labs(x = "# of meters sampled", y = "Understory plant species richness", colour = "Treatment", shape = "Treatment")
 
-plotgg1
+
+# Figure S4 #####
+ggsave(filename = "./Figures/FigS4.svg", plot = plotgg1 , device = "svg",
+       width = 6, height = 4.5, units = "in")
+
+# Fig S4 basic stats
+str(incidence_dat)
+
+# basic richness
+# Create variable for total richness
+incidence_dat_2 <- incidence_dat %>%
+  rowwise() %>%
+  mutate(richness = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  as.data.frame()
+
+hist(incidence_dat_2$richness)
+
+# huh, not what i expected.
+plant_rich_glm <- lmer(richness ~ Treatment_2017 + (1|Feet), data=incidence_dat_2)
+Anova(plant_rich_glm)
+cld(emmeans(plant_rich_glm, ~ Treatment_2017))
+
+# yeah still sig with kruskal test.
+kruskal.test(richness  ~ Treatment_2017, data=incidence_dat_2)
 
 
 # Figure 3 ### 
@@ -213,6 +233,18 @@ cld(emmeans(pap_glm,  ~ Treatment_2017, type="response"))
 
 # feet = 10 meter block transect in which % cover was measured
 # robust even with that random effect (edge to center)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
