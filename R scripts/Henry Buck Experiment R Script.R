@@ -55,7 +55,7 @@ ant_plot_dat$SE <- ant_plot_dat$A_picea.sd / sqrt(ant_plot_dat$N)
 ant_plot_dat
 
 
-# Ant figure ####
+# Fig 3 ####
 # Violin plot (?) of ant abundance for Apheanogaster
 ant_violin <- ggplot(ant_plot_dat, aes(x=Treatment, y=A_picea.mean)) +
   geom_point(stat="identity") +
@@ -108,8 +108,8 @@ matrix_dat$Treatment_2017 <- NULL
 matrix_dat$Feet <- NULL
 matrix_dat$Block <- NULL
 
-# Figure 2 ####
-# Impact of treatment on host plant diversity #######
+# NMDS ####
+
 env_dat <- as.data.frame(buck_dat)
 names(env_dat)[names(env_dat) == 'Treatment_2017'] <- 'sites'
 
@@ -175,7 +175,17 @@ cld(emmeans(plant_rich_glm, ~ Treatment_2017))
 kruskal.test(richness  ~ Treatment_2017, data=incidence_dat_2)
 
 
-# Figure 3 ### 
+# what about if you compare the overlap of the rarefaction curves
+
+
+
+
+
+
+
+
+
+# Fig 2 #### 
 # change to % coverage of each group among treatments
 # Create variable for ant-dispersed plants
 buck_dat$ant_plants <- 
@@ -235,12 +245,40 @@ cld(emmeans(pap_glm,  ~ Treatment_2017, type="response"))
 # robust even with that random effect (edge to center)
 
 
+## make a data.frame with mean and SE
+# plant_plot_dat <- buck_dat %>% drop_na() 
+# plant_plot_dat<- summaryBy(pap ~ Treatment_2017, data=plant_plot_dat, FUN=c(length,mean,sd))
+# names(plant_plot_dat)[names(plant_plot_dat)=="pap.length"] <- "N"
+# calculate standard error of the mean manually
+# plant_plot_dat$SE <- plant_plot_dat$pap.sd / sqrt(plant_plot_dat$N)
 
 
+# try with model estimates
+plant_plot_dat <- emmeans(pap_glm,  ~ Treatment_2017) %>%
+                        cld(type="response", Letters=c("abcd"))
+
+plant_plot_dat$pap.mean <- plant_plot_dat$prob
+
+#fix group labels so posthoc test looks nice
+plant_plot_dat$.group=gsub(" ", "", plant_plot_dat$.group)
+
+plant_jitter <- ggplot(plant_plot_dat, aes(x=Treatment_2017, y=pap.mean)) +
+  geom_point(stat="identity", size=2) +
+  geom_errorbar(aes(ymin=pap.mean-SE, ymax=pap.mean+SE), position=position_dodge(0.5), width=0.05) +
+  theme_bw(base_size = 12) + 
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  labs(x="Treatment", y="Proportion covered by ant-dispersed plants") + 
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5)) +
+  scale_y_continuous(limits=c(0.65, 0.8)) +
+  geom_text(aes(x = Treatment_2017, y = (pap.mean+SE), label = .group, hjust=-.9))
+plant_jitter
 
 
-
-
+# I'd call this figure 2 because you want to show the treatment evaluation first
+ggsave(filename = "./Figures/Fig2.svg", plot = plant_jitter, device = "svg",
+      width = 4, height = 4, units = "in")
 
 
 
@@ -249,10 +287,26 @@ cld(emmeans(pap_glm,  ~ Treatment_2017, type="response"))
 
 
 # Figure S1 ####
-#Comparing the diversity across all sites including non-henry-buck sites
+#Comparing the diversity across all sites from 2009 to 2010 transect data
 
-# buck_dat will have to be merged with other sites and have the same plant names
-# used across all, including morphospecies names
-## or each can be analyzed separately as a unique own matrix
+# Henry buck 2010 April 19th transect
+hbt_dat <- read.csv("./data/henry buck 2010 transect.csv", header=TRUE) %>% 
+  replace(is.na(.), 0)
+
+# What is the proportional cover of ant-dispersed plants?
 
 
+
+
+
+# What is the rarefaction curve at this site?
+hbt_species <- hbt_dat %>% dplyr::select(spring_beauty:partridgeberry) %>% 
+  mutate_if(is.numeric, ~1 * (. != 0))
+
+
+hbt_curve <- specaccum(hbt_species)
+
+plot(hbt_curve, ci.type = c("line"), ylab="Understory Plant Richness", xlab = "Meters Sampled", ylim = c(0,20))
+
+#richness
+specpool(hbt_species)
