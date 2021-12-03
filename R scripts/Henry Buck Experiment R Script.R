@@ -15,6 +15,7 @@ library("vegan")
 library("tidyverse")
 library("emmeans")
 library("multcomp")
+library("doBy")
 
 library("ggpubr")
 library("cowplot")
@@ -33,34 +34,63 @@ library("BiodiversityR")
 
 
 # 2017 Ant Data #####
-ant.dat <- read.csv("./data/alchemy cookie.csv", header=TRUE)
+ant_dat <- read.csv("./data/alchemy cookie.csv", header=TRUE)
 # look for any extra data from june 24 ant baits
 
-str(ant.data)
-# check format of ant.data
 
-# Aphaenogaster counts
-ap.model <- glm(A_picea ~ Treatment, data=ant.data)
-summary(ap.model)
-Anova(ap.model)
+# Aphaenogaster colony recruitment
+# simple non-parametric test
+kruskal.test(A_picea ~ Treatment, data=ant_dat)
 
-kruskal.test(A_picea ~ Treatment, data=ant.data)
+# Kruskal-Wallis chi-squared = 1.158, df = 2, p-value = 0.5605
 
-# Non-parametric test for ant abundance
-kruskal.test(sum.ap ~ Treatment, data=ant.data)
 
-# All colony counts
-all.model <- glm(Colony_total ~ Treatment, data=ant.data)
-Anova(all.model)
 
-# carpenter ants
-cp.model <- glm(C_pennsylvanicus ~ Treatment, data=ant.data)
-Anova(cp.model)
+# make a data.frame with mean and SE
+ant_plot_dat <- summaryBy(A_picea ~ Treatment, data=ant_dat, FUN=c(length,mean,sd))
+ant_plot_dat
 
+# Rename column for treatment length (values) to just N
+names(ant_plot_dat)[names(ant_plot_dat)=="A_picea.length"] <- "N"
+
+#calculate standard error of the mean manually
+ant_plot_dat$SE <- ant_plot_dat$A_picea.sd / sqrt(ant_plot_dat$N)
+ant_plot_dat
 
 
 # Ant figure ####
-# Violin plot (?) of ant abundance for apheanogaster and others
+# Violin plot (?) of ant abundance for Apheanogaster
+ant_violin <- ggplot(ant_plot_dat, aes(x=Treatment, y=A_picea.mean)) +
+  geom_point(stat="identity") +
+  geom_errorbar(aes(ymin=A_picea.mean-SE, ymax=A_picea.mean+SE), position=position_dodge(0.5), width=0.2) +
+  theme_bw(base_size = 12) + 
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  labs(x="Treatment", y=expression('# of'~italic(Aphaenogaster)~'colonies at baits')) + 
+  # scale_x_discrete(labels=c("Present", "Excluded")) +
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5)) +
+  geom_violin(data=ant_dat, aes(x=Treatment, y=A_picea), alpha=0, adjust = 1)
+ant_violin
+
+# I'd call this figure 3 because #1 is plot design, #2 is myrmecochore % cover
+# ggsave(filename = "./Figures/Fig3.svg", plot = ant_violin , device = "svg",
+#       width = 4, height = 4, units = "in")
+
+
+# All non-apheanogster counts ("nac")
+ant_dat$nac <- ant_dat$Colony_total - ant_dat$A_picea
+
+# no impact on the abundance of other ant species showing up at baits
+kruskal.test(nac  ~ Treatment, data=ant_dat)
+
+# Kruskal-Wallis chi-squared = 0.78385, df = 2, p-value = 0.6758
+
+
+
+
+
+
 
 
 
