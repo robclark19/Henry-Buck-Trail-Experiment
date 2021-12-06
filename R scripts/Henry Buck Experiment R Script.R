@@ -13,7 +13,6 @@ library("tidyverse")
 library("emmeans")
 library("multcomp")
 library("doBy")
-
 library("ggpubr")
 library("cowplot")
 library("ggrepel")
@@ -285,8 +284,9 @@ ggsave(filename = "./Figures/Fig2.svg", plot = plant_jitter, device = "svg",
 
 
 
+# Richness Curves ####
 
-# Figure S1 ####
+# Figure S1a ####
 #Comparing the diversity across all sites from 2009 to 2010 transect data
 
 # Henry buck 2010 April 19th transect
@@ -294,10 +294,7 @@ hbt_dat <- read.csv("./data/henry buck 2010 transect.csv", header=TRUE) %>%
   replace(is.na(.), 0)
 
 # What is the proportional cover of ant-dispersed plants?
-
-
-
-
+#
 
 # What is the rarefaction curve at this site?
 hbt_species <- hbt_dat %>% dplyr::select(spring_beauty:partridgeberry) %>% 
@@ -306,7 +303,117 @@ hbt_species <- hbt_dat %>% dplyr::select(spring_beauty:partridgeberry) %>%
 
 hbt_curve <- specaccum(hbt_species)
 
-plot(hbt_curve, ci.type = c("line"), ylab="Understory Plant Richness", xlab = "Meters Sampled", ylim = c(0,20))
+FigS1a <- plot(hbt_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
+     xlab = "Meters Sampled", ylim = c(0,20), main="Henry Buck Trail")
 
-#richness
+#richness estimates (various approaches)
 specpool(hbt_species)
+
+poolaccum(hbt_species)
+
+plot(poolaccum(hbt_species), display = "jack1")
+
+estimateR(hbt_species) %>% plot()
+
+
+
+
+
+
+# Figure S1b #####
+
+# Galcoe preserve
+gft_dat <- read.csv("./data/galko farm wallingford transect.csv", header=TRUE) %>% 
+  replace(is.na(.), 0)
+
+# need to drop woody plants first line-by-line
+gft_dat$cherry.seedling <- NULL
+gft_dat$hornbeam.seedling <- NULL
+gft_dat$hornbeam.seedling <- NULL
+gft_dat$hickory.seedling <- NULL
+gft_dat$chestnut.oak.seedling <- NULL
+gft_dat$virginia.creeper <- NULL
+gft_dat$poison.ivy <- NULL
+gft_dat$asiatic.bittersweet <- NULL
+gft_dat$raspberry <- NULL
+gft_dat$multiflora.rose.seedling <- NULL
+gft_dat$burning.bush.seedling <- NULL
+
+
+
+# What is the proportional cover of ant-dispersed plants?
+#
+
+
+
+
+
+
+# What is the rarefaction curve at this site?
+gft_species <- gft_dat %>% dplyr::select(solomon.seal:goldenrod) %>% 
+  mutate_if(is.numeric, ~1 * (. != 0))
+
+
+gft_curve <- specaccum(gft_species)
+
+FigS1b <- plot(gft_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
+     xlab = "Meters Sampled", ylim = c(0,20), main = "Galcoe Farm Preserve")
+
+
+
+# Figure S1c ####
+# Ragged mountain upslope
+rmu_dat <- read.csv("./data/ragged mountain april 12 2010 transect.csv", header=TRUE) %>% 
+  replace(is.na(.), 0)
+
+
+# What is the proportional cover of ant-dispersed plants?
+#
+
+
+# What is the rarefaction curve at this site?
+rmu_species <- rmu_dat %>% dplyr::select(trout.lily:red.trillium) %>% 
+  mutate_if(is.numeric, ~1 * (. != 0))
+
+
+rmu_curve <- specaccum(rmu_species)
+
+FigS1c <- plot(rmu_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
+     xlab = "Meters Sampled", ylim = c(0,20), main="Ragged Mountain upslope")
+
+
+
+
+
+# Figure S1d #####
+# ragged mountain downslope
+rmd_dat <- read.csv("./data/ragged mountain april 14 2010 transect.csv", header=TRUE) %>% 
+  replace(is.na(.), 0)
+
+
+
+# What is the proportional cover of ant-dispersed plants?
+#
+
+
+# What is the rarefaction curve at this site?
+rmd_species <- rmd_dat %>% dplyr::select(trout.lily:canada.mayflower) %>% 
+  mutate_if(is.numeric, ~1 * (. != 0))
+
+
+rmd_curve <- specaccum(rmd_species)
+
+FigS1d <-  plot(rmd_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
+     xlab = "Meters Sampled", ylim = c(0,20), main="Ragged Mountain downslope")
+
+
+
+
+
+# Combine Fig S1 ####
+# FigS1abcd <- ggarrange(FigS1a, FigS1b, FigS1c, FigS1d, labels = c("A", "B", "C", "D"), nrow = 2)
+
+
+ggsave(filename= "./Figures/FigS1a.jpeg", plot = FigS1a , device = "jpeg", 
+       width=3, height=3, units = "in")
+
