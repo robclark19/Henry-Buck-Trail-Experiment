@@ -102,12 +102,65 @@ buck_dat <- read_excel("Data/2017 henry buck trail plant community plots.xlsx") 
 # change to incidence based data rather than worker counts
 incidence_dat <- buck_dat %>% mutate_if(is.numeric, ~1 * (. != 0))
 
+# Make species matrix
 matrix_dat <- incidence_dat
 matrix_dat$Treatment_2017 <- NULL
 matrix_dat$Feet <- NULL
 matrix_dat$Block <- NULL
 
-# NMDS ####
+# Must remove some rows that are all zeroes
+matrix_dat <- matrix_dat %>% 
+  filter_all(any_vars(. != 0))
+
+# Might need to do some pooling or removals
+
+# remove species with less than 5 instances coverage
+matrix_dat_2 <- matrix_dat[, -which(numcolwise(sum)(matrix_dat) < 5)]
+
+
+# NMDS
+hb_nmds <- metaMDS(matrix_dat_2, k=2, plot=TRUE)
+hb_nmds
+
+
+# Make environmental matrix
+# env_dat will be the matrix with env variables added back in to match length
+
+# or figure out what ten rows are dropped
+
+
+#just plot points (sites and species)
+plot(hb_nmds)
+
+#ordination plot (starts with blank ordination that layers can be added on)
+ordiplot(hb_nmds, type="none")
+#species plot (add insect species first)
+orditorp(hb_nmds,display="species",col="black",air=0.2,cex=1)
+# draws a shape around it based on the environmental variable of interest
+ordihull(hb_nmds, groups=Treatment_2017, draw="polygon",col="grey90",label=T)
+
+
+# Hypothesis test
+# actual statistical test to for urban vs. rural has different community structure
+hb_fit <- envfit(hb_nmds ~ Treatment_2017, data=nmds.dat, perm=999)
+hb_fit
+
+
+
+
+
+
+
+
+# Fig 1 HB Pie Charts ####
+
+
+
+
+
+
+
+# Rarefaction ####
 
 env_dat <- as.data.frame(buck_dat)
 names(env_dat)[names(env_dat) == 'Treatment_2017'] <- 'sites'
@@ -116,6 +169,7 @@ names(env_dat)[names(env_dat) == 'Treatment_2017'] <- 'sites'
 
 Accum.3 <- accumcomp(matrix_dat, y=env_dat, factor='sites', 
                      method="exact", conditioned=F, plotit=F)
+
 
 
 
