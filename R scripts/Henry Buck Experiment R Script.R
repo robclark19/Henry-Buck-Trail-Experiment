@@ -99,8 +99,17 @@ buck_dat <- read_excel("Data/2017 henry buck trail plant community plots.xlsx") 
 
 
 # For NMDS and specaccum make an incidence based dataset
-# change to incidence based data rather than worker counts
+# change to incidence based data rather than plant cm coverage
 incidence_dat <- buck_dat %>% mutate_if(is.numeric, ~1 * (. != 0))
+
+# make a drop column
+incidence_dat <- incidence_dat %>%
+  rowwise() %>%
+  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  as.data.frame()
+
+incidence_dat <- subset(incidence_dat, total_plants != 0)
+incidence_dat$total_plants <- NULL
 
 # Make species matrix
 matrix_dat <- incidence_dat
@@ -108,23 +117,41 @@ matrix_dat$Treatment_2017 <- NULL
 matrix_dat$Feet <- NULL
 matrix_dat$Block <- NULL
 
-# Must remove some rows that are all zeroes
+# Must remove some transect rows that are all zeroes
 matrix_dat <- matrix_dat %>% 
   filter_all(any_vars(. != 0))
 
 # Might need to do some pooling or removals
 
-# remove species with less than 5 instances coverage
-matrix_dat_2 <- matrix_dat[, -which(numcolwise(sum)(matrix_dat) < 5)]
-
+# remove species columns with less than 5
+#matrix_dat$Bloodroot <- NULL
+#matrix_dat$Fern_plant <- NULL
+#matrix_dat$Cinquefoil <- NULL
+#matrix_dat$Hepatica <- NULL
+#matrix_dat$Fern_plant <- NULL
+#matrix_dat$Anemone <- NULL
+#matrix_dat$Wood_aster <- NULL
+#matrix_dat$Starflower <- NULL
+#matrix_dat$Hepatica <- NULL
+#matrix_dat$Jumpseed <- NULL
+#matrix_dat$Cleavers <- NULL
+#matrix_dat$Carrot_sp <- NULL
+#matrix_dat$Yellow_violet <- NULL
+#matrix_dat$house_plant_flower <- NULL
+#matrix_dat$Allium<- NULL
+#matrix_dat$Stinging_nettle <- NULL
+#matrix_dat$Wide_carex <- NULL
+#matrix_dat$Fuzzy_plant <- NULL
+#matrix_dat$Indian_cucumber <- NULL
 
 # NMDS
-hb_nmds <- metaMDS(matrix_dat_2, k=2, plot=TRUE)
+hb_nmds <- metaMDS(matrix_dat, k=3, plot=TRUE)
 hb_nmds
 
 
 # Make environmental matrix
 # env_dat will be the matrix with env variables added back in to match length
+attach(incidence_dat)
 
 # or figure out what ten rows are dropped
 
@@ -142,8 +169,10 @@ ordihull(hb_nmds, groups=Treatment_2017, draw="polygon",col="grey90",label=T)
 
 # Hypothesis test
 # actual statistical test to for urban vs. rural has different community structure
-hb_fit <- envfit(hb_nmds ~ Treatment_2017, data=nmds.dat, perm=999)
+hb_fit <- envfit(hb_nmds ~ Treatment_2017, perm=999)
 hb_fit
+
+# p = 0.312 r2 = 0.0.218 ok cool.
 
 
 
@@ -153,6 +182,118 @@ hb_fit
 
 
 # Fig 1 HB Pie Charts ####
+str(buck_dat)
+
+# Create new dataframe for calculating total coverage of ant plants
+pie_dat <- buck_dat
+
+pie_dat$ant_plants <- 
+  (pie_dat$Spring_beauty +
+     pie_dat$Trout_lily +
+     pie_dat$Mayflower +
+     pie_dat$Trillium +
+     pie_dat$D_breeches +
+     pie_dat$Anemone +
+     pie_dat$Hepatica +
+     pie_dat$Yellow_violet)
+
+# most common myrmecochores are:
+# Spring beauty, trout lily, dutchman's, trillium
+
+
+
+# Non-myrmecochores
+# Create variable for total coverage
+pie_dat <- pie_dat %>%
+  rowwise() %>%
+  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  as.data.frame()
+
+# Create variable for non-ant-dispersed plants
+pie_dat$non_ant_plants <- pie_dat$total_plants - pie_dat$ant_plants
+
+# Other non-common myrmecochores
+# create variable for common myrmecochores
+pie_dat <- pie_dat %>%
+  rowwise() %>%
+  mutate(total_commons = sum(across(c("Trillium", "Trout_lily","Spring_beauty","D_breeches")), na.rm = T))
+
+# total non common ant plants
+pie_dat$non_common_ant_plants <- pie_dat$ant_plants - pie_dat$total_commons
+
+
+
+
+
+# pie chart should have 6 variables:
+# Spring beauty, trout lily, dutchman's, trillium, non-myrmecochores, rare myrmecochores
+
+pie2_dat <- subset(pie_dat, select=c("Block","Trillium", "Trout_lily","Spring_beauty","D_breeches", "non_common_ant_plants", "non_ant_plants"))
+
+
+# then group into 3 to 9 circles based on these counts sorted by treatment
+
+# summarize by each treatment combo
+pie2_dat$Block <- as.factor(pie2_dat$Block)
+
+
+pie3_dat <- pie2_dat %>%
+  group_by(Block) %>%
+  summarize(Trillium = sum(Trillium), 
+            Trout_lily = sum(Trout_lily), 
+            Dutchmans_breeches = sum(D_breeches), 
+            Spring_beauty = sum(Spring_beauty),
+            Other_myrmecohores = sum(non_common_ant_plants),
+            Non_myrmecochores = sum(non_ant_plants))
+
+# pie 1
+# jesus christ i would have been done with this in an hour if i used excel
+p1 <- colnames(pie3_dat) %>% as.data.frame()
+p1$cover <- t(pie3_dat[1,])
+p1 <- p1[-c(1), ]
+names(p1)[1] <- "plant"
+p1$plant <- as.factor(p1$plant)
+p1$cover <- as.numeric(p1$cover)
+
+
+#ggplot pie chart
+p1_plot <- ggplot(p1, aes(x="", y=cover, fill=plant)) +
+  geom_bar(stat="identity", width=1, color="black") +
+  geom_text(aes(label = cover),
+            position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void() +
+  scale_fill_discrete(name = "Plant Category", 
+                      labels=c("Dutchman's breeches", "Non-myrmecochores", "Other myrmecochores",
+                               "Spring beauty", "Red Trillium", "Trout Lily"))
+
+
+p1_plot
+
+
+# ok, now do the same thing but for blocks 2-9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
