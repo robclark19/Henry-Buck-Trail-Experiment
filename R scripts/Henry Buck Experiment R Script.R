@@ -43,7 +43,8 @@ kruskal.test(A_picea ~ Treatment, data=ant_dat)
 
 
 # make a data.frame with mean and SE
-ant_plot_dat <- summaryBy(A_picea ~ Treatment, data=ant_dat, FUN=c(length,mean,sd))
+ant_plot_dat <- 
+  maryBy(A_picea ~ Treatment, data=ant_dat, FUN=c(length,mean,sd))
 ant_plot_dat
 
 # Rename column for treatment length (values) to just N
@@ -105,7 +106,8 @@ incidence_dat <- buck_dat %>% mutate_if(is.numeric, ~1 * (. != 0))
 # make a drop column
 incidence_dat <- incidence_dat %>%
   rowwise() %>%
-  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(total_plants = 
+           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
   as.data.frame()
 
 incidence_dat <- subset(incidence_dat, total_plants != 0)
@@ -206,7 +208,8 @@ pie_dat$ant_plants <-
 # Create variable for total coverage
 pie_dat <- pie_dat %>%
   rowwise() %>%
-  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(total_plants = 
+           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
   as.data.frame()
 
 # Create variable for non-ant-dispersed plants
@@ -216,7 +219,8 @@ pie_dat$non_ant_plants <- pie_dat$total_plants - pie_dat$ant_plants
 # create variable for common myrmecochores
 pie_dat <- pie_dat %>%
   rowwise() %>%
-  mutate(total_commons = sum(across(c("Trillium", "Trout_lily","Spring_beauty","D_breeches")), na.rm = T))
+  mutate(total_commons = 
+           (across(c("Trillium", "Trout_lily","Spring_beauty","D_breeches")), na.rm = T))
 
 # total non common ant plants
 pie_dat$non_common_ant_plants <- pie_dat$ant_plants - pie_dat$total_commons
@@ -233,18 +237,26 @@ pie2_dat <- subset(pie_dat, select=c("Block","Trillium", "Trout_lily","Spring_be
 
 # then group into 3 to 9 circles based on these counts sorted by treatment
 
-# summarize by each treatment combo
+# 
+marize by each treatment combo
 pie2_dat$Block <- as.factor(pie2_dat$Block)
 
 
 pie3_dat <- pie2_dat %>%
   group_by(Block) %>%
-  summarize(Trillium = sum(Trillium), 
-            Trout_lily = sum(Trout_lily), 
-            Dutchmans_breeches = sum(D_breeches), 
-            Spring_beauty = sum(Spring_beauty),
-            Other_myrmecohores = sum(non_common_ant_plants),
-            Non_myrmecochores = sum(non_ant_plants))
+  
+  marize(Trillium = 
+              (Trillium), 
+            Trout_lily = 
+              (Trout_lily), 
+            Dutchmans_breeches = 
+              (D_breeches), 
+            Spring_beauty = 
+              (Spring_beauty),
+            Other_myrmecohores = 
+              (non_common_ant_plants),
+            Non_myrmecochores = 
+              (non_ant_plants))
 
 # pie 1
 # jesus christ i would have been done with this in an hour if i used excel
@@ -563,7 +575,8 @@ str(incidence_dat)
 # Create variable for total richness
 incidence_dat_2 <- incidence_dat %>%
   rowwise() %>%
-  mutate(richness = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(richness = 
+           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
   as.data.frame()
 
 hist(incidence_dat_2$richness)
@@ -602,7 +615,8 @@ buck_dat$ant_plants <-
 # Create variable for total coverage
 buck_dat <- buck_dat %>%
 rowwise() %>%
-  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(total_plants = 
+           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
  as.data.frame()
 
 # Create variable for non-ant-dispersed plants
@@ -649,7 +663,8 @@ cld(emmeans(pap_glm,  ~ Treatment_2017, type="response"))
 
 ## make a data.frame with mean and SE
 # plant_plot_dat <- buck_dat %>% drop_na() 
-# plant_plot_dat<- summaryBy(pap ~ Treatment_2017, data=plant_plot_dat, FUN=c(length,mean,sd))
+# plant_plot_dat<- 
+maryBy(pap ~ Treatment_2017, data=plant_plot_dat, FUN=c(length,mean,sd))
 # names(plant_plot_dat)[names(plant_plot_dat)=="pap.length"] <- "N"
 # calculate standard error of the mean manually
 # plant_plot_dat$SE <- plant_plot_dat$pap.sd / sqrt(plant_plot_dat$N)
@@ -683,6 +698,24 @@ ggsave(filename = "./Figures/Fig2.svg", plot = plant_jitter, device = "svg",
       width = 4, height = 4, units = "in")
 
 
+
+
+# Trillium GLMM ####
+# tadd = trillium add
+
+
+buck_dat$tadd <- buck_dat$Trillium / buck_dat$total_plants
+
+tadd_glm <- glmer(tadd ~ Treatment_2017 + (1|Feet), weights=total_plants, family=binomial, data=buck_dat)
+
+Anova(tadd_glm)
+plot(emmeans(tadd_glm,  ~ Treatment_2017, type="response"))
+
+pairs(emmeans(tadd_glm,  ~ Treatment_2017, type="response"))
+
+
+
+# ok lets find the total coverage of each block
 
 
 
