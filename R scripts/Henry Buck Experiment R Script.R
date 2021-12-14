@@ -248,12 +248,22 @@ pie3_dat <- pie2_dat %>%
 
 # pie 1
 # jesus christ i would have been done with this in an hour if i used excel
+
 p1 <- colnames(pie3_dat) %>% as.data.frame()
 p1$cover <- t(pie3_dat[1,])
 p1 <- p1[-c(1), ]
 names(p1)[1] <- "plant"
 p1$plant <- as.factor(p1$plant)
 p1$cover <- as.numeric(p1$cover)
+
+
+
+# Make a list of the names to use in the figure:
+pie_list <- c("Dutchman's breeches", "Non-myrmecochores", "Other myrmecochores",
+              "Spring beauty", "Red Trillium", "Trout Lily")
+
+pie_order <- c("Dutchmans_breeches", "Trillium", "Spring_beauty", "Other_myrmecohores", "Non-myrmecochores")
+
 
 
 #ggplot pie chart
@@ -263,21 +273,28 @@ p1_plot <- ggplot(p1, aes(x="", y=cover, fill=plant)) +
             position = position_stack(vjust = 0.5)) +
   coord_polar(theta="y") +
   theme_void() +
-  scale_fill_discrete(name = "Plant Category", 
-                      labels=c("Dutchman's breeches", "Non-myrmecochores", "Other myrmecochores",
-                               "Spring beauty", "Red Trillium", "Trout Lily"))
-
-
+  scale_fill_brewer(name = "Plant Category", labels=pie_list, palette = "Accent")
 p1_plot
 
 
 # ok, now do the same thing but for blocks 2-9
+p2 <- colnames(pie3_dat) %>% as.data.frame()
+p2$cover <- t(pie3_dat[2,])
+p2 <- p2[-c(1), ]
+names(p2)[1] <- "plant"
+p2$plant <- as.factor(p2$plant)
+p2$cover <- as.numeric(p2$cover)
 
 
-
-
-
-
+#ggplot pie chart
+p2_plot <- ggplot(p2, aes(x="", y=cover, fill=plant)) +
+  geom_bar(stat="identity", width=1, color="black") +
+  geom_text(aes(label = cover),
+            position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void() +
+  scale_fill_brewer(name="Plant Category",labels=pie.list, palette="Accent")
+p2_plot
 
 
 
