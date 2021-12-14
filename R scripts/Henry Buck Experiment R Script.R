@@ -106,8 +106,7 @@ incidence_dat <- buck_dat %>% mutate_if(is.numeric, ~1 * (. != 0))
 # make a drop column
 incidence_dat <- incidence_dat %>%
   rowwise() %>%
-  mutate(total_plants = 
-           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
   as.data.frame()
 
 incidence_dat <- subset(incidence_dat, total_plants != 0)
@@ -208,8 +207,7 @@ pie_dat$ant_plants <-
 # Create variable for total coverage
 pie_dat <- pie_dat %>%
   rowwise() %>%
-  mutate(total_plants = 
-           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
   as.data.frame()
 
 # Create variable for non-ant-dispersed plants
@@ -219,8 +217,7 @@ pie_dat$non_ant_plants <- pie_dat$total_plants - pie_dat$ant_plants
 # create variable for common myrmecochores
 pie_dat <- pie_dat %>%
   rowwise() %>%
-  mutate(total_commons = 
-           (across(c("Trillium", "Trout_lily","Spring_beauty","D_breeches")), na.rm = T))
+  mutate(total_commons =sum(across(c("Trillium", "Trout_lily","Spring_beauty","D_breeches")), na.rm = T))
 
 # total non common ant plants
 pie_dat$non_common_ant_plants <- pie_dat$ant_plants - pie_dat$total_commons
@@ -237,26 +234,18 @@ pie2_dat <- subset(pie_dat, select=c("Block","Trillium", "Trout_lily","Spring_be
 
 # then group into 3 to 9 circles based on these counts sorted by treatment
 
-# 
-marize by each treatment combo
+# summarize by each treatment combo
 pie2_dat$Block <- as.factor(pie2_dat$Block)
 
 
 pie3_dat <- pie2_dat %>%
   group_by(Block) %>%
-  
-  marize(Trillium = 
-              (Trillium), 
-            Trout_lily = 
-              (Trout_lily), 
-            Dutchmans_breeches = 
-              (D_breeches), 
-            Spring_beauty = 
-              (Spring_beauty),
-            Other_myrmecohores = 
-              (non_common_ant_plants),
-            Non_myrmecochores = 
-              (non_ant_plants))
+  summarize(Trillium = sum(Trillium), 
+            Trout_lily = sum(Trout_lily), 
+            Dutchmans_breeches = sum(D_breeches), 
+            Spring_beauty = sum(Spring_beauty),
+            Other_myrmecohores = sum(non_common_ant_plants),
+            Non_myrmecochores = sum(non_ant_plants))
 
 # pie 1
 # jesus christ i would have been done with this in an hour if i used excel
@@ -498,8 +487,8 @@ pie_fig_all <- ggarrange(p1_plot, p2_plot, p3_plot, p4_plot, p5_plot, p6_plot, p
                                      0.05, 0.2, 0))
 pie_fig_all
 
-ggsave(filename = "./Figures/Fig1.svg", plot = pie_fig_all, device = "svg",
-      width = 8, height = 7, units = "in")
+# ggsave(filename = "./Figures/Fig1.svg", plot = pie_fig_all, device = "svg",
+#      width = 8, height = 7, units = "in")
 
 
 
@@ -575,8 +564,7 @@ str(incidence_dat)
 # Create variable for total richness
 incidence_dat_2 <- incidence_dat %>%
   rowwise() %>%
-  mutate(richness = 
-           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(richness = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
   as.data.frame()
 
 hist(incidence_dat_2$richness)
@@ -615,8 +603,7 @@ buck_dat$ant_plants <-
 # Create variable for total coverage
 buck_dat <- buck_dat %>%
 rowwise() %>%
-  mutate(total_plants = 
-           (across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
+  mutate(total_plants = sum(across(Spring_beauty:Fuzzy_plant), na.rm = T))   %>%
  as.data.frame()
 
 # Create variable for non-ant-dispersed plants
@@ -702,11 +689,17 @@ ggsave(filename = "./Figures/Fig2.svg", plot = plant_jitter, device = "svg",
 
 # Trillium GLMM ####
 # tadd = trillium add
+buck_dat$Block <- as.factor(buck_dat$Block)
+
+ trillium_count <- buck_dat %>%
+ mutate_if(is.numeric, ~1 * (. != 0))
+
+trillium_count <- trillium_count %>%
+  group_by(Block, Treatment_2017) %>%
+  summarize(Trillium = sum(Trillium))
 
 
-buck_dat$tadd <- buck_dat$Trillium / buck_dat$total_plants
-
-tadd_glm <- glmer(tadd ~ Treatment_2017 + (1|Feet), weights=total_plants, family=binomial, data=buck_dat)
+tadd_glm <- glm.nb(Trillium ~ Treatment_2017, data=trillium_count)
 
 Anova(tadd_glm)
 plot(emmeans(tadd_glm,  ~ Treatment_2017, type="response"))
@@ -715,7 +708,9 @@ pairs(emmeans(tadd_glm,  ~ Treatment_2017, type="response"))
 
 
 
-# ok lets find the total coverage of each block
+# ok lets find the total counts per block, yeah no difference
+# check that the blocks are right. these totals for the add group make little sense
+# they could be right, but just triple check
 
 
 
