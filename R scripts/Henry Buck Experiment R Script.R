@@ -172,7 +172,7 @@ ordihull(hb_nmds, groups=Treatment_2017, draw="polygon",col="grey90",label=T)
 hb_fit <- envfit(hb_nmds ~ Treatment_2017, perm=999)
 hb_fit
 
-# p = 0.312 r2 = 0.0.218 ok cool.
+# p = 0.312 r2 = 0.0218 ok cool.
 
 
 
@@ -260,20 +260,22 @@ p1$cover <- as.numeric(p1$cover)
 
 # Make a list of the names to use in the figure:
 pie_list <- c("Dutchman's breeches", "Non-myrmecochores", "Other myrmecochores",
-              "Spring beauty", "Red Trillium", "Trout Lily")
+              "Spring beauty", "Red trillium", "Trout Lily")
 
-pie_order <- c("Dutchmans_breeches", "Trillium", "Spring_beauty", "Other_myrmecohores", "Non-myrmecochores")
+pie_order <- c("Dutchmans_breeches", "Trillium", "Trout_lily", "Spring_beauty", "Other_myrmecohores", "Non-myrmecochores")
 
-
+pie_list_2 <- c("Dutchman's breeches", "Red trillium", "Trout lily", "Spring beauty", 
+                "Other myrmecochores", "Non-myrmecochores")
 
 #ggplot pie chart
-p1_plot <- ggplot(p1, aes(x="", y=cover, fill=plant)) +
+# this treatment should be: control
+p1_plot <- ggplot(p1, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  geom_text(aes(label = cover),
-            position = position_stack(vjust = 0.5)) +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
   coord_polar(theta="y") +
-  theme_void() +
-  scale_fill_brewer(name = "Plant Category", labels=pie_list, palette = "Accent")
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name = "Plant Category", labels=pie_list_2, palette = "Accent")
 p1_plot
 
 
@@ -286,17 +288,206 @@ p2$plant <- as.factor(p2$plant)
 p2$cover <- as.numeric(p2$cover)
 
 
-#ggplot pie chart
-p2_plot <- ggplot(p2, aes(x="", y=cover, fill=plant)) +
+# ggplot pie chart
+# this treatment should be: remove
+p2_plot <- ggplot(p2, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  geom_text(aes(label = cover),
-            position = position_stack(vjust = 0.5)) +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
   coord_polar(theta="y") +
-  theme_void() +
-  scale_fill_brewer(name="Plant Category",labels=pie.list, palette="Accent")
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
 p2_plot
 
+#p3
+p3 <- colnames(pie3_dat) %>% as.data.frame()
+# change [x] to the block number
+p3$cover <- t(pie3_dat[3,])
+# drop block var
+p3 <- p3[-c(1), ]
+# rename column header
+names(p3)[1] <- "plant"
+p3$plant <- as.factor(p3$plant)
+p3$cover <- as.numeric(p3$cover)
 
+
+# ggplot pie chart
+# this treatment should be: remove
+p3_plot <- ggplot(p3, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
+p3_plot
+
+# p4
+p4 <- colnames(pie3_dat) %>% as.data.frame()
+# change [x] to the block number
+p4$cover <- t(pie3_dat[4,])
+# drop block var
+p4 <- p4[-c(1), ]
+# rename column header
+names(p4)[1] <- "plant"
+p4$plant <- as.factor(p4$plant)
+p4$cover <- as.numeric(p4$cover)
+
+
+# ggplot pie chart
+# this treatment should be: remove
+p4_plot <- ggplot(p4, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
+p4_plot
+
+
+#p5
+p5 <- colnames(pie3_dat) %>% as.data.frame()
+# change [x] to the block number
+p5$cover <- t(pie3_dat[5,])
+# drop block var
+p5 <- p5[-c(1), ]
+# rename column header
+names(p5)[1] <- "plant"
+p5$plant <- as.factor(p5$plant)
+p5$cover <- as.numeric(p5$cover)
+
+# this treatment should be: control
+p5_plot <- ggplot(p5, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
+p5_plot
+
+
+
+#p6
+p6 <- colnames(pie3_dat) %>% as.data.frame()
+# change [x] to the block number
+p6$cover <- t(pie3_dat[6,])
+# drop block var
+p6 <- p6[-c(1), ]
+# rename column header
+names(p6)[1] <- "plant"
+p6$plant <- as.factor(p6$plant)
+p6$cover <- as.numeric(p6$cover)
+
+# this treatment should be: remove
+p6_plot <- ggplot(p6, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
+p6_plot
+
+
+
+#p7
+p7 <- colnames(pie3_dat) %>% as.data.frame()
+# change [x] to the block number
+p7$cover <- t(pie3_dat[7,])
+# drop block var
+p7 <- p7[-c(1), ]
+# rename column header
+names(p7)[1] <- "plant"
+p7$plant <- as.factor(p7$plant)
+p7$cover <- as.numeric(p7$cover)
+
+# this treatment should be: remove
+p7_plot <- ggplot(p7, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
+p7_plot
+
+
+
+#p8
+p8 <- colnames(pie3_dat) %>% as.data.frame()
+# change [x] to the block number
+p8$cover <- t(pie3_dat[8,])
+# drop block var
+p8 <- p8[-c(1), ]
+# rename column header
+names(p8)[1] <- "plant"
+p8$plant <- as.factor(p8$plant)
+p8$cover <- as.numeric(p8$cover)
+
+# this treatment should be: add
+p8_plot <- ggplot(p8, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
+p8_plot
+
+
+#p9
+p9 <- colnames(pie3_dat) %>% as.data.frame()
+# change [x] to the block number
+p9$cover <- t(pie3_dat[9,])
+# drop block var
+p9 <- p9[-c(1), ]
+# rename column header
+names(p9)[1] <- "plant"
+p9$plant <- as.factor(p9$plant)
+p9$cover <- as.numeric(p9$cover)
+
+# this treatment should be: control
+p9_plot <- ggplot(p9, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  #geom_text(aes(label = cover),
+  #          position = position_stack(vjust = 0.5)) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 18) +
+  scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
+p9_plot
+
+
+
+
+
+
+# Fig 1 Export ####
+p_all_labels <- c("1 | Control", 
+                  "2 | Remove", 
+                  "3 | Add",
+                  "4 | Add",
+                  "5 | Control",
+                  "6 | Remove",
+                  "7 | Remove",
+                  "8 | Add",
+                  "9 | Control")
+
+#
+pie_fig_all <- ggarrange(p1_plot, p2_plot, p3_plot, p4_plot, p5_plot, p6_plot, p7_plot, p8_plot, p9_plot,
+                         labels = p_all_labels, 
+                         nrow = 3, ncol = 3,
+                          common.legend = TRUE, 
+                         legend = "right",
+                         vjust = 1.5,
+                         label.x = c(0, 0.05, 0.2, 
+                                     0.2, 0, 0.05,
+                                     0.05, 0.2, 0))
+pie_fig_all
+
+ggsave(filename = "./Figures/Fig1.svg", plot = pie_fig_all, device = "svg",
+      width = 8, height = 7, units = "in")
 
 
 
