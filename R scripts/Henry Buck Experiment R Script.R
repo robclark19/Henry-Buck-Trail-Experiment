@@ -733,6 +733,7 @@ hbt_species <- hbt_dat %>% dplyr::select(spring_beauty:partridgeberry) %>%
 
 
 hbt_curve <- specaccum(hbt_species)
+specpool(hbt_species)
 
 FigS1a <- plot(hbt_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
      xlab = "Meters Sampled", ylim = c(0,20), main="Henry Buck Trail")
@@ -753,7 +754,7 @@ estimateR(hbt_species) %>% plot()
 
 # Figure S1b #####
 
-# Galcoe preserve
+# Galko preserve
 gft_dat <- read.csv("./data/galko farm wallingford transect.csv", header=TRUE) %>% 
   replace(is.na(.), 0)
 
@@ -786,9 +787,10 @@ gft_species <- gft_dat %>% dplyr::select(solomon.seal:goldenrod) %>%
 
 
 gft_curve <- specaccum(gft_species)
+specpool(gft_species)
 
 FigS1b <- plot(gft_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
-     xlab = "Meters Sampled", ylim = c(0,20), main = "Galcoe Farm Preserve")
+     xlab = "Meters Sampled", ylim = c(0,20), main = "Galko Farm Preserve")
 
 
 
@@ -808,6 +810,8 @@ rmu_species <- rmu_dat %>% dplyr::select(trout.lily:red.trillium) %>%
 
 
 rmu_curve <- specaccum(rmu_species)
+
+specpool(rmu_species)
 
 FigS1c <- plot(rmu_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
      xlab = "Meters Sampled", ylim = c(0,20), main="Ragged Mountain upslope")
@@ -833,6 +837,7 @@ rmd_species <- rmd_dat %>% dplyr::select(trout.lily:canada.mayflower) %>%
 
 
 rmd_curve <- specaccum(rmd_species)
+specpool(rmd_species)
 
 FigS1d <-  plot(rmd_curve, ci.type = c("line"), ylab="Understory Plant Richness", 
      xlab = "Meters Sampled", ylim = c(0,20), main="Ragged Mountain downslope")
