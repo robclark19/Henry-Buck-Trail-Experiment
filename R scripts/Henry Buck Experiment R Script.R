@@ -272,8 +272,9 @@ pie_list_2 <- c("Dutchman's breeches", "Red trillium", "Trout lily", "Spring bea
 # this treatment should be: control
 p1_plot <- ggplot(p1, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+           position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name = "Plant Category", labels=pie_list_2, palette = "Accent")
@@ -293,8 +294,9 @@ p2$cover <- as.numeric(p2$cover)
 # this treatment should be: remove
 p2_plot <- ggplot(p2, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -316,8 +318,9 @@ p3$cover <- as.numeric(p3$cover)
 # this treatment should be: remove
 p3_plot <- ggplot(p3, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -339,8 +342,9 @@ p4$cover <- as.numeric(p4$cover)
 # this treatment should be: remove
 p4_plot <- ggplot(p4, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1, check.overlap = TRUE) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -361,8 +365,9 @@ p5$cover <- as.numeric(p5$cover)
 # this treatment should be: control
 p5_plot <- ggplot(p5, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -384,8 +389,9 @@ p6$cover <- as.numeric(p6$cover)
 # this treatment should be: remove
 p6_plot <- ggplot(p6, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -407,8 +413,9 @@ p7$cover <- as.numeric(p7$cover)
 # this treatment should be: remove
 p7_plot <- ggplot(p7, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -430,8 +437,9 @@ p8$cover <- as.numeric(p8$cover)
 # this treatment should be: add
 p8_plot <- ggplot(p8, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -452,8 +460,9 @@ p9$cover <- as.numeric(p9$cover)
 # this treatment should be: control
 p9_plot <- ggplot(p9, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
   geom_bar(stat="identity", width=1, color="black") +
-  #geom_text(aes(label = cover),
-  #          position = position_stack(vjust = 0.5)) +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=3.1) +
   coord_polar(theta="y") +
   theme_void(base_size = 18) +
   scale_fill_brewer(name="Plant Category",labels=pie_list_2, palette="Accent")
@@ -487,8 +496,8 @@ pie_fig_all <- ggarrange(p1_plot, p2_plot, p3_plot, p4_plot, p5_plot, p6_plot, p
                                      0.05, 0.2, 0))
 pie_fig_all
 
-# ggsave(filename = "./Figures/Fig1.svg", plot = pie_fig_all, device = "svg",
-#      width = 8, height = 7, units = "in")
+ggsave(filename = "./Figures/Fig1.svg", plot = pie_fig_all, device = "svg",
+      width = 9, height = 8, units = "in")
 
 
 
@@ -681,8 +690,7 @@ plant_jitter
 
 
 # I'd call this figure 2 because you want to show the treatment evaluation first
-ggsave(filename = "./Figures/Fig2.svg", plot = plant_jitter, device = "svg",
-      width = 4, height = 4, units = "in")
+# ggsave(filename = "./Figures/Fig2.svg", plot = plant_jitter, device = "svg",width = 4,height = 4,units = "in")
 
 
 
@@ -848,8 +856,5 @@ FigS1d <-  plot(rmd_curve, ci.type = c("line"), ylab="Understory Plant Richness"
 
 # Combine Fig S1 ####
 # FigS1abcd <- ggarrange(FigS1a, FigS1b, FigS1c, FigS1d, labels = c("A", "B", "C", "D"), nrow = 2)
-
-
-ggsave(filename= "./Figures/FigS1a.jpeg", plot = FigS1a , device = "jpeg", 
-       width=3, height=3, units = "in")
+# ggsave(filename= "./Figures/FigS1a.jpeg", plot = FigS1a , device = "jpeg", width=3, height=3, units = "in")
 
