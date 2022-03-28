@@ -44,7 +44,7 @@ kruskal.test(A_picea ~ Treatment, data=ant_dat)
 
 # make a data.frame with mean and SE
 ant_plot_dat <- 
-  maryBy(A_picea ~ Treatment, data=ant_dat, FUN=c(length,mean,sd))
+  summaryBy(A_picea ~ Treatment, data=ant_dat, FUN=c(length,mean,sd))
 ant_plot_dat
 
 # Rename column for treatment length (values) to just N
@@ -83,7 +83,19 @@ kruskal.test(nac  ~ Treatment, data=ant_dat)
 
 # Kruskal-Wallis chi-squared = 0.78385, df = 2, p-value = 0.6758
 
+# get summary statistics for nac (non apheaenogaster colonies)
 
+# make a data.frame with mean and SE
+nac_dat <- 
+  summaryBy(nac ~ Treatment, data=ant_dat, FUN=c(length,mean,sd))
+nac_dat
+
+# Rename column for treatment length (values) to just N
+names(nac_dat)[names(nac_dat)=="nac.length"] <- "N"
+
+#calculate standard error of the mean manually
+nac_dat$SE <- nac_dat$nac.sd / sqrt(nac_dat$N)
+nac_dat
 
 
 
@@ -693,21 +705,53 @@ plant_jitter
 # ggsave(filename = "./Figures/Fig2.svg", plot = plant_jitter, device = "svg",width = 4,height = 4,units = "in")
 
 
+# Fig 2 stacked #######
+# ok we need to add the same groupings as Fig. 1 to this figure
+# drop geom point, then draw a new geom_bar pulling from a different pooled data which contains the %
+
+# find total coverage
+stack_dat <- buck_dat %>% group_by(Treatment_2017) %>%
+  summarise(ant_plants = sum(ant_plants), total_plants=sum(total_plants), non_ant_plants=sum(non_ant_plants))
+
+# find proportional coverage
+stack_dat$prop_ant <- stack_dat$ant_plants / stack_dat$total_plants
+stack_dat$prop_non_ant <- stack_dat$non_ant_plants / stack_dat$total_plants
+
+# drop values used for calcs of proportions
+stack_dat = subset(stack_dat, select = c("prop_ant","prop_non_ant","Treatment_2017"))
+
+# pivot so there is a column containing the values among plant groups and treatments
+# https://tidyr.tidyverse.org/reference/pivot_longer.html
+stack_dat <- stack_dat %>% pivot_longer(!Treatment_2017, names_to = "plant_group")
+
+plant_jitter_2 <- ggplot() +
+  geom_bar(data=stack_dat, stat="identity", position = position_stack(reverse = TRUE), aes(x=Treatment_2017, y=value, fill=plant_group)) +
+  geom_errorbar(data=plant_plot_dat, stat="identity", aes(x=Treatment_2017, ymin=pap.mean-SE, ymax=pap.mean+SE), position=position_dodge(0.5), width=0.05) +
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+      axis.line.y = element_line(color="black", size = 0.5)) +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+  theme_bw(base_size = 12) +
+  geom_text(data=plant_plot_dat, aes(x = Treatment_2017, y = (pap.mean+SE), label = .group, hjust=-.9)) +
+  labs(x="Treatment", y="Proportion of plant coverage out of the entire community", fill="Plant Group") +
+  scale_fill_manual(values=c("grey45", "grey"), labels=c("Ant plants","Non-ant-plants"))
+
+plant_jitter_2
 
 
 # Trillium GLMM ####
 # tadd = trillium add
 buck_dat$Block <- as.factor(buck_dat$Block)
 
- trillium_count <- buck_dat %>%
- mutate_if(is.numeric, ~1 * (. != 0))
+trillium_count <- buck_dat
+
 
 trillium_count <- trillium_count %>%
   group_by(Block, Treatment_2017) %>%
   summarize(Trillium = sum(Trillium))
 
 
-tadd_glm <- glm.nb(Trillium ~ Treatment_2017, data=trillium_count)
+tadd_glm <- glmer.nb(Trillium ~ Treatment_2017 + (1|Block), data=trillium_count)
 
 Anova(tadd_glm)
 plot(emmeans(tadd_glm,  ~ Treatment_2017, type="response"))
