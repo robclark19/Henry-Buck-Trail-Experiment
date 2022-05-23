@@ -902,3 +902,116 @@ FigS1d <-  plot(rmd_curve, ci.type = c("line"), ylab="Understory Plant Richness"
 # FigS1abcd <- ggarrange(FigS1a, FigS1b, FigS1c, FigS1d, labels = c("A", "B", "C", "D"), nrow = 2)
 # ggsave(filename= "./Figures/FigS1a.jpeg", plot = FigS1a , device = "jpeg", width=3, height=3, units = "in")
 
+
+
+
+
+# New Figure S2 ######
+# A pie chart for 2010 henry buck data
+hbt_dat
+
+
+# Create new dataframe for calculating total coverage of ant plants
+pie_dat <- hbt_dat
+
+pie_dat$ant_plants <- 
+  (pie_dat$spring_beauty +
+     pie_dat$trout_lily +
+     pie_dat$red_trillium +
+     pie_dat$d_breeches +
+     pie_dat$anenome_sp +
+     pie_dat$viola_sp_2 +
+     pie_dat$white_violet)
+
+# most common myrmecochores are:
+# Spring beauty, trout lily, dutchman's, trillium
+
+
+
+
+# Non-myrmecochores
+# Create variable for total coverage
+pie_dat <- pie_dat %>%
+  rowwise() %>%
+  mutate(total_plants = sum(across(spring_beauty:partridgeberry), na.rm = T))   %>%
+  as.data.frame()
+
+# Create variable for non-ant-dispersed plants
+pie_dat$non_ant_plants <- pie_dat$total_plants - pie_dat$ant_plants
+
+# curious what the proportion is
+
+pie3_dat$total_plants / pie3_dat$ant_plants
+
+
+# Other non-common myrmecochores
+# create variable for common myrmecochores
+pie_dat <- pie_dat %>%
+  rowwise() %>%
+  mutate(total_commons = sum(across(c("red_trillium", "trout_lily","spring_beauty","d_breeches")), na.rm = T))
+
+# total non common ant plants
+pie_dat$non_common_ant_plants <- pie_dat$ant_plants - pie_dat$total_commons
+
+
+
+
+# pie chart should have 6 variables:
+# Spring beauty, trout lily, dutchman's, trillium, non-myrmecochores, rare myrmecochores
+
+pie2_dat <- subset(pie_dat, select=c("section","red_trillium", "trout_lily","spring_beauty","d_breeches", "non_common_ant_plants", "non_ant_plants"))
+
+
+# then group into 3 to 9 circles based on these counts sorted by treatment
+
+# summarize by each treatment combo
+pie2_dat$Block <- as.factor(pie2_dat$section)
+
+
+pie3_dat <- pie2_dat %>%
+  group_by(Block) %>%
+  summarize(Trillium = sum(red_trillium), 
+            Trout_lily = sum(trout_lily), 
+            Dutchmans_breeches = sum(d_breeches), 
+            Spring_beauty = sum(spring_beauty),
+            Other_myrmecohores = sum(non_common_ant_plants),
+            Non_myrmecochores = sum(non_ant_plants))
+
+# proportions (approx 15%)
+1 - (pie3_dat$Trillium + pie3_dat$Trout_lily + pie3_dat$Dutchmans_breeches + pie3_dat$Spring_beauty + pie3_dat$Other_myrmecohores) /
+(pie3_dat$Trillium + pie3_dat$Trout_lily + pie3_dat$Dutchmans_breeches + pie3_dat$Spring_beauty + pie3_dat$Other_myrmecohores + pie3_dat$Non_myrmecochores)
+
+# pie 1
+# jesus christ i would have been done with this in an hour if i used excel
+
+p1 <- colnames(pie3_dat) %>% as.data.frame()
+p1$cover <- t(pie3_dat[1,])
+p1 <- p1[-c(1), ]
+names(p1)[1] <- "plant"
+p1$plant <- as.factor(p1$plant)
+p1$cover <- as.numeric(p1$cover)
+
+
+
+# Make a list of the names to use in the figure:
+pie_list <- c("Dutchman's breeches", "Non-myrmecochores", "Other myrmecochores",
+              "Spring beauty", "Red trillium", "Trout Lily")
+
+pie_order <- c("Dutchmans_breeches", "Trillium", "Trout_lily", "Spring_beauty", "Other_myrmecohores", "Non-myrmecochores")
+
+pie_list_2 <- c("Dutchman's breeches", "Red trillium", "Trout lily", "Spring beauty", 
+                "Other myrmecochores", "Non-myrmecochores")
+
+#ggplot pie chart
+# this treatment should be: control
+ps2_plot <- ggplot(p1, aes(x="", y=cover, fill=factor(plant, levels=pie_order))) +
+  geom_bar(stat="identity", width=1, color="black") +
+  # translate inches to cm for plotting the coverage values
+  geom_text(aes(x=1.7, label = signif((cover*2.54), digits=2)),
+            position = position_stack(vjust = 0.5), size=5) +
+  coord_polar(theta="y") +
+  theme_void(base_size = 24) +
+  scale_fill_brewer(name = "Plant Category", labels=pie_list_2, palette = "Accent")
+ps2_plot
+
+
